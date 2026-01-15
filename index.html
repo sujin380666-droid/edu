@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 허브 - To-Do & Journal</title>
+    <meta name="description" content="학생 스스로 학습 계획을 세우고 성찰을 기록하는 자기주도적 학습 도구">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Learning Hub</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" id="nav-todo" onclick="switchTab('todo')">
+                    <i class="fas fa-check-double"></i>
+                    <span>할 일 목록</span>
+                </li>
+                <li id="nav-journal" onclick="switchTab('journal')">
+                    <i class="fas fa-book-open"></i>
+                    <span>성찰 일기</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <p>© 2026 학습 허브</p>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- To-Do Section -->
+            <section id="section-todo" class="tab-content active">
+                <header class="section-header">
+                    <h1>오늘의 학습 계획</h1>
+                    <p>스스로 계획하고 실천하며 성장하세요.</p>
+                </header>
+
+                <div class="todo-grid">
+                    <div class="todo-input-card card">
+                        <h3>새로운 과제 추가</h3>
+                        <form id="todo-form">
+                            <input type="text" id="todo-input" placeholder="어떤 공부를 할 건가요?" required>
+                            <div class="subject-selector">
+                                <label>과목 선택:</label>
+                                <div class="subject-options">
+                                    <label class="subject-option">
+                                        <input type="radio" name="subject" value="korean" checked>
+                                        <span class="dot korean"></span> 국어
+                                    </label>
+                                    <label class="subject-option">
+                                        <input type="radio" name="subject" value="math">
+                                        <span class="dot math"></span> 수학
+                                    </label>
+                                    <label class="subject-option">
+                                        <input type="radio" name="subject" value="english">
+                                        <span class="dot english"></span> 영어
+                                    </label>
+                                    <label class="subject-option">
+                                        <input type="radio" name="subject" value="science">
+                                        <span class="dot science"></span> 과학
+                                    </label>
+                                    <label class="subject-option">
+                                        <input type="radio" name="subject" value="other">
+                                        <span class="dot other"></span> 기타
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-plus"></i> 추가하기
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="todo-list-card card">
+                        <h3>할 일 목록</h3>
+                        <div id="todo-list" class="todo-items">
+                            <!-- Todo items will be injected here -->
+                            <div class="empty-state">
+                                <i class="fas fa-tasks"></i>
+                                <p>등록된 할 일이 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Journal Section -->
+            <section id="section-journal" class="tab-content">
+                <header class="section-header">
+                    <h1>하루 성찰 일기</h1>
+                    <p>오늘의 배움과 생각을 자유롭게 기록해 보세요.</p>
+                </header>
+
+                <div class="journal-wrapper">
+                    <div class="journal-editor-card card">
+                        <div class="editor-header">
+                            <input type="date" id="journal-date">
+                        </div>
+                        <textarea id="journal-input" placeholder="오늘 어떤 것을 배웠나요? 가장 기억에 남는 순간은 무엇인가요?"></textarea>
+                        <button id="save-journal" class="btn-primary">
+                            <i class="fas fa-save"></i> 저장하기
+                        </button>
+                    </div>
+
+                    <div class="journal-list-card card">
+                        <h3>과거 기록</h3>
+                        <div id="journal-list" class="journal-items">
+                            <!-- Journal entries will be injected here -->
+                            <div class="empty-state">
+                                <i class="fas fa-pen-nib"></i>
+                                <p>작성된 일기가 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
