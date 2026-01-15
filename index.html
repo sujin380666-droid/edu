@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 허브 - To-Do & Journal</title>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* [원본 스타일 그대로 반영] */
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --color-korean: #ff6b6b;
+            --color-math: #4dabf7;
+            --color-english: #63e6be;
+            --color-science: #ffd43b;
+            --color-other: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+
+        /* 움직이는 배경 블롭 애니메이션 */
+        body::before, body::after {
+            content: ''; position: absolute; width: 600px; height: 600px;
+            border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.2;
+            animation: move 25s infinite alternate;
+        }
+        body::before { background: var(--primary-color); top: -200px; right: -100px; }
+        body::after { background: #ec4899; bottom: -200px; left: -100px; animation-delay: -12s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(-150px, 150px) scale(1.1); }
+        }
+
+        .app-container { display: flex; height: 100vh; }
+
+        .sidebar {
+            width: 260px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column; padding: 2.5rem 1.5rem; z-index: 10;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 0.8rem; font-size: 1.6rem;
+            font-weight: 800; color: var(--primary-color); margin-bottom: 3.5rem;
+        }
+
+        .nav-links { list-style: none; flex: 1; }
+        .nav-links li {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem;
+            border-radius: 0.8rem; cursor: pointer; transition: all 0.3s;
+            color: var(--text-muted); font-weight: 600; margin-bottom: 0.6rem;
+        }
+        .nav-links li:hover { background-color: #f1f5f9; color: var(--text-main); }
+        .nav-links li.active {
+            background-color: var(--primary-color); color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        .content { flex: 1; overflow-y: auto; padding: 3rem; background: rgba(248, 250, 252, 0.4); }
+
+        .card {
+            background: var(--card-bg); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 1.5rem; padding: 2rem; box-shadow: var(--shadow);
+        }
+
+        .section-header { margin-bottom: 3rem; }
+        .section-header h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.6rem; }
+        .section-header p { color: var(--text-muted); font-size: 1.15rem; }
+
+        .todo-grid { display: grid; grid-template-columns: 380px 1fr; gap: 2.5rem; }
+
+        input[type="text"], input[type="date"], textarea {
+            width: 100%; padding: 1rem 1.2rem; border: 1px solid var(--border-color);
+            border-radius: 0.8rem; font-size: 1rem; outline: none; transition: all 0.2s;
+            font-family: inherit; background: white;
+        }
+        input:focus, textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12); }
+        textarea { min-height: 250px; resize: vertical; margin-bottom: 1.5rem; }
+
+        .subject-options { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.8rem; margin-bottom: 2rem; }
+        .subject-option {
+            display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer;
+            padding: 0.6rem 1rem; border-radius: 2rem; background: white; border: 1px solid var(--border-color);
+        }
+        .subject-option input { display: none; }
+        .subject-option:has(input:checked) { border-color: var(--primary-color); background: #f5f3ff; }
+        .subject-option input:checked + .dot + span { font-weight: 700; color: var(--primary-color); }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.korean { background: var(--color-korean); }
+        .dot.math { background: var(--color-math); }
+        .dot.english { background: var(--color-english); }
+        .dot.science { background: var(--color-science); }
+        .dot.other { background: var(--color-other); }
+
+        .btn-primary {
+            background: var(--primary-color); color: white; border: none; padding: 1rem;
+            border-radius: 0.8rem; font-weight: 700; font-size: 1rem; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%;
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+
+        .todo-item {
+            display: flex; align-items: center; gap: 1.2rem; padding: 1.25rem;
+            background: white; border-radius: 1.2rem; border-left: 6px solid; margin-bottom: 1rem; transition: 0.3s;
+        }
+        .todo-item:hover { transform: translateX(8px); box-shadow: var(--shadow); }
+        .todo-item.korean { border-left-color: var(--color-korean); }
+        .todo-item.math { border-left-color: var(--color-math); }
+        .todo-item.english { border-left-color: var(--color-english); }
+        .todo-item.science { border-left-color: var(--color-science); }
+        .todo-item.other { border-left-color: var(--color-other); }
+        .todo-item.completed { opacity: 0.5; }
+        .todo-item.completed span { text-decoration: line-through; color: var(--text-muted); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .sidebar-footer { padding-top: 1.5rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-muted); text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Learning Hub</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" id="nav-todo" onclick="switchTab('todo')">
+                    <i class="fas fa-check-double"></i>
+                    <span>할 일 목록</span>
+                </li>
+                <li id="nav-journal" onclick="switchTab('journal')">
+                    <i class="fas fa-book-open"></i>
+                    <span>성찰 일기</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer"><p>© 2026 학습 허브</p></div>
+        </nav>
+
+        <main class="content">
+            <section id="section-todo" class="tab-content active">
+                <header class="section-header">
+                    <h1>오늘의 학습 계획</h1>
+                    <p>스스로 계획하고 실천하며 성장하세요.</p>
+                </header>
+
+                <div class="todo-grid">
+                    <div class="todo-input-card card">
+                        <h3>새로운 과제 추가</h3>
+                        <form id="todo-form">
+                            <input type="text" id="todo-input" placeholder="어떤 공부를 할 건가요?" required>
+                            <div class="subject-selector">
+                                <label style="font-weight: 600; font-size: 0.9rem;">과목 선택:</label>
+                                <div class="subject-options">
+                                    <label class="subject-option"><input type="radio" name="subject" value="korean" checked><span class="dot korean"></span> 국어</label>
+                                    <label class="subject-option"><input type="radio" name="subject" value="math"><span class="dot math"></span> 수학</label>
+                                    <label class="subject-option"><input type="radio" name="subject" value="english"><span class="dot english"></span> 영어</label>
+                                    <label class="subject-option"><input type="radio" name="subject" value="science"><span class="dot science"></span> 과학</label>
+                                    <label class="subject-option"><input type="radio" name="subject" value="other"><span class="dot other"></span> 기타</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> 추가하기</button>
+                        </form>
+                    </div>
+                    <div class="todo-list-card card">
+                        <h3>할 일 목록</h3>
+                        <div id="todo-list" class="todo-items"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section-journal" class="tab-content">
+                <header class="section-header">
+                    <h1>하루 성찰 일기</h1>
+                    <p>오늘의 배움과 생각을 자유롭게 기록해 보세요.</p>
+                </header>
+                <div class="journal-wrapper">
+                    <div class="journal-editor-card card">
+                        <div class="editor-header"><input type="date" id="journal-date"></div>
+                        <textarea id="journal-input" placeholder="오늘 어떤 것을 배웠나요? 가장 기억에 남는 순간은 무엇인가요?"></textarea>
+                        <button id="save-journal" class="btn-primary"><i class="fas fa-save"></i> 저장하기</button>
+                    </div>
+                    <div class="journal-list-card card" style="margin-top: 2rem;">
+                        <h3>과거 기록</h3>
+                        <div id="journal-list" class="journal-items"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* [원본 로직 그대로 반영] */
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+        let journals = JSON.parse(localStorage.getItem('journals')) || [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('journal-date');
+            if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+            renderTodos();
+            renderJournals();
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+            document.getElementById(`nav-${tab}`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
+            document.getElementById(`section-${tab}`).classList.add('active');
+        }
+
+        document.getElementById('todo-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('todo-input');
+            const subject = document.querySelector('input[name="subject"]:checked').value;
+            if(!input.value.trim()) return;
+            todos.unshift({ id: Date.now(), text: input.value, subject, completed: false });
+            saveAndRenderTodos();
+            input.value = '';
+        });
+
+        function toggleTodo(id) {
+            todos = todos.map(t => t.id === id ? {...t, completed: !t.completed} : t);
+            saveAndRenderTodos();
+        }
+
+        function deleteTodo(id) {
+            if(confirm('삭제하시겠습니까?')) {
+                todos = todos.filter(t => t.id !== id);
+                saveAndRenderTodos();
+            }
+        }
+
+        function saveAndRenderTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+            renderTodos();
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            if (todos.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:3rem; color:#94a3b8;"><i class="fas fa-tasks" style="font-size:3rem; opacity:0.2;"></i><p>할 일이 없습니다.</p></div>';
+                return;
+            }
+            list.innerHTML = todos.map(t => `
+                <div class="todo-item ${t.subject} ${t.completed ? 'completed' : ''}">
+                    <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTodo(${t.id})" style="width:1.3rem; height:1.3rem; cursor:pointer;">
+                    <span style="flex:1; font-weight:600; font-size:1.05rem;">${t.text}</span>
+                    <button onclick="deleteTodo(${t.id})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.1rem;"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('save-journal').addEventListener('click', () => {
+            const content = document.getElementById('journal-input').value;
+            const date = document.getElementById('journal-date').value;
+            if(!content.trim()) return;
+            journals.unshift({ id: Date.now(), date, content });
+            localStorage.setItem('journals', JSON.stringify(journals));
+            renderJournals();
+            document.getElementById('journal-input').value = '';
+            alert('기록이 저장되었습니다.');
+        });
+
+        function deleteJournal(id) {
+            if(confirm('이 기록을 삭제하시겠습니까?')) {
+                journals = journals.filter(j => j.id !== id);
+                localStorage.setItem('journals', JSON.stringify(journals));
+                renderJournals();
+            }
+        }
+
+        function renderJournals() {
+            const list = document.getElementById('journal-list');
+            if (journals.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:3rem; color:#94a3b8;"><i class="fas fa-pen-nib" style="font-size:3rem; opacity:0.2;"></i><p>기록이 없습니다.</p></div>';
+                return;
+            }
+            list.innerHTML = journals.map(j => `
+                <div class="card" style="margin-bottom:1.5rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                        <span style="color:var(--primary-color); font-weight:800; font-size:1.1rem;">${j.date}</span>
+                        <button onclick="deleteJournal(${j.id})" style="background:none; border:none; color:#ef4444; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div style="line-height:1.7; white-space:pre-wrap; font-size:1rem; color:var(--text-main);">${j.content}</div>
+                </div>
+            `).join('');
+        }
+
+        // Global for button clicks
+        window.switchTab = switchTab;
+        window.toggleTodo = toggleTodo;
+        window.deleteTodo = deleteTodo;
+        window.deleteJournal = deleteJournal;
+    </script>
+</body>
+</html>
